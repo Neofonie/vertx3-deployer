@@ -46,6 +46,7 @@ When one verticle does not start, the process is terminated.
     ] 
 }
 ```
+
 All other fields you define are passed into the Verticle-core. They are not
 sanity checked by the deployer.
 
@@ -54,25 +55,29 @@ sanity checked by the deployer.
 You can pass a specific configuration to a verticle using the "config" field.
 
 
-## global-config
+## Global Configuration
 
 Sometimes you will have the need to share configuration parameters across
 more verticles. You can repeat this configuration in every verticle or you
-can make use of a special construction in the JSON. This configuraton will
-be available in all verticles.
+can make use of a special construction in the JSON config file. 
+The fields you specify will be available in all verticles. You can overwrite
+these values in the verticle itself. The configuration of the verticle
+takes precedence.
 
+
+```
 {
-  "global-config": {
-    "service-name": "xxxx",
+  "config": {
+    "service-name": "my-service",
     "pipeline": {
-        "pipeSize": 52428800,
-        "saveBatchSize": 64,
-        "maxSaveChunks": 5
+        "size": 123456,        
+        "threads": 5
     }
    "verticles": [
         // ....
     ] 
 }
+```
 
 ## The StartVerticle
 
