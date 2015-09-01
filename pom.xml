@@ -3,20 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.neofonie.libs</groupId>
+    <groupId>de.neofonie</groupId>
     <artifactId>vertx3-deployer</artifactId>
     <packaging>jar</packaging>
     <version>LATEST</version>
-    <name>lib-vertx3-deployer</name>
+    <name>vertx3-deployer</name>
     <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!-- Tracking info -->
-        <pipeline.counter>local</pipeline.counter>
-        <pipeline.name>local</pipeline.name>
-        <git.revision>local</git.revision>
     </properties>
 
     <repositories>
@@ -39,13 +34,6 @@
     </dependencies>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>2.8</version>
-            </extension>
-        </extensions>
         
         <plugins>
           
@@ -59,30 +47,8 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-           
-            <!-- Add manifest trackback info -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Service-Name>${project.artifactId}</Service-Name>
-                            <Pipeline-Counter>${pipeline.counter}</Pipeline-Counter>
-                            <Pipeline-Name>${pipeline.name}</Pipeline-Name>
-                            <Git-Revision>${git.revision}</Git-Revision>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
+          
         </plugins>
     </build>
-    
-    <distributionManagement>
-        <repository>
-            <id>CI-Repo</id>
-            <url>scpexe://repo.neofonie.de/data/m2repo-wub</url>
-        </repository>
-    </distributionManagement>
+
 </project>

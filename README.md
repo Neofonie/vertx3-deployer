@@ -1,8 +1,10 @@
 # Vertx 3 Deployer Module
 
-A problem when you have a lot of verticles to deploy, is how to define
-dependencies between them, define an order, and organize the configuration. This
-project aims to solve those issues through a configuration file where you
+One of the problems you encounter when you have a lot of verticles to deploy, 
+is how to define dependencies between them, define an order, and organize the 
+configuration. 
+
+This project aims to solve those issues through a configuration file where you
 can define the verticles and the dependencies between them. You can easily
 create a configuration which will be passed to the verticle.
 
@@ -44,6 +46,12 @@ When one verticle does not start, the process is terminated.
     ] 
 }
 ```
+All other fields you define are passed into the Verticle-core. They are not
+sanity checked by the deployer.
+
+## Configuration
+
+You can pass a specific configuration to a verticle using the "config" field.
 
 
 ## global-config
