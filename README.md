@@ -63,8 +63,8 @@ be available in all verticles.
 
 {
   "global-config": {
-    "service-name": "${service.name}",
-    "drugs-import": {
+    "service-name": "xxxx",
+    "pipeline": {
         "pipeSize": 52428800,
         "saveBatchSize": 64,
         "maxSaveChunks": 5
