@@ -51,15 +51,13 @@ public class DeployerVerticleTest {
 
     /**
      * Test a single deployment.
-     * 
+     *
      * @param context The Vertx context
      */
     @Test
-    public void simpleDeploy(final TestContext context) {
+    public void simpleDeployment(final TestContext context) {
 
-        JsonObject configuration = this.readConfiguration("/simple.json");
-        DeployerVerticle mock = PowerMockito.mock(DeployerVerticle.class, Mockito.CALLS_REAL_METHODS);
-        PowerMockito.when(mock.loadConfiguration()).thenReturn(configuration);
+        DeployerVerticle mock = this.prepareDeployer("/simple.json");
         
         Async async = context.async();
         rule.vertx().deployVerticle(mock,
@@ -67,6 +65,7 @@ public class DeployerVerticleTest {
                     try {
                         context.assertTrue(serverReply.succeeded());
                         context.assertFalse(serverReply.failed());
+                        context.assertTrue(mock.deployed.contains("verticle-simple"));
                     } finally {
                         async.complete();
                         rule.vertx().close();
@@ -75,8 +74,50 @@ public class DeployerVerticleTest {
     }
 
     /**
+     * Test a single deployment with unknown verticle.
+     *
+     * @param context The Vertx context
+     */
+    @Test
+    public void wrongDeployment(final TestContext context) {
+
+        DeployerVerticle mock = this.prepareDeployer("/simple-wrong.json");
+
+        Async async = context.async();
+        rule.vertx().deployVerticle(mock,
+                (AsyncResult<String> serverReply) -> {
+                    try {
+                        context.assertFalse(serverReply.succeeded());
+                        context.assertTrue(serverReply.failed());
+                    } finally {
+                        async.complete();
+                        rule.vertx().close();
+                    }
+                });
+    }
+
+    /**
+     * Test a single deployment with a config.
+     *
+     * @param context The Vertx context
+     */
+    @Test
+    public void configDeployment(final TestContext context) {
+
+        DeployerVerticle mock = this.prepareDeployer("/simple-config.json");
+
+        Async async = context.async();
+        rule.vertx().deployVerticle(mock,
+                (AsyncResult<String> serverReply) -> {
+                    context.assertTrue(serverReply.succeeded());
+                    async.complete();
+                    rule.vertx().close();
+                });
+    }
+
+    /**
      * Read a JSON configuration from the classpath.
-     * 
+     *
      * @param name The filename to read from.
      * @return JsonObject with the configuration.
      */
@@ -90,5 +131,18 @@ public class DeployerVerticleTest {
             fail(e.getMessage());
         }
         return result;
+    }
+
+    /**
+     * Init the mock with a custom configFile.
+     * 
+     * @param configFile The JSON configfile
+     * @return A deployerVerticle with the configFile loaded
+     */
+    private DeployerVerticle prepareDeployer(final String configFile) {
+        JsonObject configuration = this.readConfiguration(configFile);
+        DeployerVerticle mock = PowerMockito.mock(DeployerVerticle.class, Mockito.CALLS_REAL_METHODS);
+        PowerMockito.when(mock.loadConfiguration()).thenReturn(configuration);
+        return mock;
     }
 }

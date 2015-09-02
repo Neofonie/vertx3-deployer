@@ -25,19 +25,26 @@ package de.neofonie.deployer;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 
 /**
- * Simple Verticle
+ * Simple Verticle checking its configuration.
  *
  * @author jan.decooman@neofonie.de
  */
-public class TestVerticle1 extends AbstractVerticle {
 
-    
+public class TestVerticle2 extends AbstractVerticle {
+
     @Override
     public void start(Future<Void> startFuture) throws Exception {
-        startFuture.complete();
+        JsonObject config = context.config();
+        if ("text".equals(config.getString("field3"))
+                && Integer.valueOf(300).equals(config.getInteger("field2"))
+                && config.getJsonObject("field1") != null) {
+            startFuture.complete();
+        } else {
+            startFuture.fail("wrong config");
+        }
     }
-    
-    
+
 }

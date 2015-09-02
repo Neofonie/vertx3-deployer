@@ -65,7 +65,7 @@ public class DeployerVerticle extends AbstractVerticle {
     
     protected final static String CONFIG = "config";
 
-    private JsonArray deployed = null;
+    protected JsonArray deployed = null;
 
     private JsonObject workingCopy = null;
 

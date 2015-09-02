@@ -1,0 +1,17 @@
+{
+    "config": {
+        "field1": {
+            "subfield1": "subvalue1"
+        },
+        "field2": 100
+    },
+    "verticles": {
+        "verticle-simple": {
+            "name": "de.neofonie.deployer.TestVerticle2",
+            "config": {
+                "field2": 300,
+                "field3": "text"
+            }
+        }
+    }
+}
