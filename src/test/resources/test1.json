@@ -1,0 +1,18 @@
+{
+   "verticles": {
+         "mongodb": {
+            "worker": true,
+            "name": "de.neofonie.verticle.MongoVerticle",
+            "instances": 1,
+            "multithreaded": false
+          },
+          "import": {
+            "dependsOn": ["mongodb"],
+            "name": "de.neofonie.verticle.ImportVerticle"
+          },
+          "server": {
+            "dependsOn": ["mongodb", "import"],
+            "name": "de.neofonie.verticle.ServerVerticle"
+          }
+    }
+}

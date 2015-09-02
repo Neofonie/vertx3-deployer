@@ -23,6 +23,7 @@ SOFTWARE.
  */
 package de.neofonie.deployer;
 
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import java.io.IOException;
 import java.net.URI;
@@ -37,14 +38,14 @@ import java.util.logging.Logger;
 
 /**
  * Read the configuration for the deployer. The configuration must be stored in
- * a file called "app-conf.json". This file must be available on the classpath.
+ * a file called "deployer.json". This file must be available on the classpath.
  *
  * @author jan.decooman@neofonie.de, jonas.muecke@neofonie.de
  */
-public class AppConfigLoader {
+public class ConfigLoader {
 
     private static final Logger LOG
-            = Logger.getLogger(AppConfigLoader.class.getName());
+            = Logger.getLogger(ConfigLoader.class.getName());
 
     /**
      * Load the global application configuration. The global application state
@@ -58,11 +59,11 @@ public class AppConfigLoader {
 
         // read file by convention
         LOG.info("Looking for the deployer configuration");
-        URL appConf = AppConfigLoader.class.getResource("/app-conf.json");
+        URL appConf = loadURL();
+        
         if (appConf != null) {
             LOG.info("Deployer configuration found");
             try {
-                System.out.println(appConf.toURI());
                 URI uri = appConf.toURI();
                 initFileSystemIfNeeded(uri);
 
@@ -70,13 +71,18 @@ public class AppConfigLoader {
                 result = new JsonObject(new String(readAllBytes, "UTF-8"));
                 LOG.info("Deployer configuration loaded");
                 
-            } catch (IOException | URISyntaxException e) {
+            } catch (IOException | URISyntaxException | DecodeException e) {
                 LOG.log(Level.SEVERE, "Global application configuration invalid", e);
             }
         } else {
             LOG.info("Global application configuration not found.");
         }
         return result;
+    }
+
+    protected static URL loadURL() {
+        URL appConf = ConfigLoader.class.getResource("/deployer.json");
+        return appConf;
     }
 
     /**

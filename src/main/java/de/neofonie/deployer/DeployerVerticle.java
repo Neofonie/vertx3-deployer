@@ -1,25 +1,25 @@
 /*
-The MIT License (MIT)
+ The MIT License (MIT)
 
-Copyright (c) 2015 Neofonie GmbH
+ Copyright (c) 2015 Neofonie GmbH
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
  */
 package de.neofonie.deployer;
 
@@ -40,19 +40,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Deploys verticles defined in the app-conf.json configuration file. The
- * deployer iterates through the configuration and deploys the verticles.
- * It respects the "dependsOn" order. It will only deploy verticles in the
- * chronological order in the configuration and only when the dependencies
- * are satisfied. When a verticle is not deployed, the deployer-verticle
- * exits.
- * 
- * You can only initialize one DeployerVerticle at once. Otherwise you
- * will deploy verticles in parallel.
+ * Deploys verticles defined in the deployer.json configuration file. The
+ * deployer iterates through the configuration and deploys the verticles. It
+ * respects the "dependsOn" order. It will only deploy verticles in the
+ * chronological order in the configuration and only when the dependencies are
+ * satisfied. When a verticle is not deployed, the deployer-verticle exits.
  *
- * The deployer uses a localHandler and does not propagate events across
- * the cluster. You'll notice that localConsumer doesn't accept an AsyncResult
- * handler. The deployment can happen synchronously. 
+ * You can only initialize one DeployerVerticle at once. Otherwise you will
+ * deploy verticles in parallel.
+ *
+ * The deployer uses a localHandler and does not propagate events across the
+ * cluster. You'll notice that localConsumer doesn't accept an AsyncResult
+ * handler. The deployment can happen synchronously.
  *
  * @author jan.decooman@neofonie.de, jonas.muecke@neofonie.de
  */
@@ -60,13 +59,17 @@ public class DeployerVerticle extends AbstractVerticle {
 
     private static final Logger LOG = Logger.getLogger(DeployerVerticle.class.getName());
 
-    public final String LOOPBACK = "local://" + DeployerVerticle.class.getName();
+    protected final static String LOOPBACK = "local://" + DeployerVerticle.class.getName();
 
-    public final JsonArray deployed = new JsonArray();
-
-    public JsonObject workingCopy = null;
+    protected final static String VERTICLES = "verticles";
     
-    public JsonObject globalConfig = null;
+    protected final static String CONFIG = "config";
+
+    private JsonArray deployed = null;
+
+    private JsonObject workingCopy = null;
+
+    private JsonObject globalConfig = null;
 
     /**
      * Start the deployer.
@@ -76,19 +79,24 @@ public class DeployerVerticle extends AbstractVerticle {
     @Override
     public void start(final Future<Void> startFuture) {
 
-        // load the app-conf.json when available
-        JsonObject configuration = AppConfigLoader.loadConfiguration();
+        // load the deployer.json when available
+        JsonObject configuration = this.loadConfiguration();
 
         if (configuration != null) {
 
+            deployed = new JsonArray();
+            
             // assign loopback to this handler
             vertx.eventBus().localConsumer(LOOPBACK, this::deployVerticle);
 
-            // copy the current configuration
-            workingCopy = configuration.copy();
-            globalConfig = workingCopy.getJsonObject("global-config", new JsonObject());
-            LOG.log(Level.INFO, "Used global config: {0}", globalConfig.encodePrettily());
-            workingCopy.remove("global-config");
+            // copy the current verticle configuration
+            workingCopy = configuration.
+                    getJsonObject(VERTICLES, new JsonObject()).
+                    copy();
+
+            // set the global configuration
+            globalConfig = configuration.
+                    getJsonObject(CONFIG, new JsonObject());
 
             // start iterations
             vertx.eventBus().send(LOOPBACK, workingCopy, (AsyncResult<Message<Boolean>> event) -> {
@@ -101,8 +109,16 @@ public class DeployerVerticle extends AbstractVerticle {
                 }
             });
         } else {
-            LOG.info("No app-conf.json found on the classpath.");
+            LOG.info("No deployer.json found on the classpath.");
         }
+    }
+
+    /**
+     * Load the configuration
+     * @return JsonObject with the configuration
+     */
+    protected JsonObject loadConfiguration() {
+        return ConfigLoader.loadConfiguration();
     }
 
     /**
@@ -116,7 +132,9 @@ public class DeployerVerticle extends AbstractVerticle {
         }
     }
 
-    /** Iterate and deploy verticles */
+    /**
+     * Iterate and deploy verticles
+     */
     private void deployVerticle(final Message<JsonObject> event) {
 
         // iterate over all candidates to be deployed
