@@ -34,7 +34,6 @@ import io.vertx.core.json.JsonObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -99,7 +98,7 @@ public class DeployerVerticle extends AbstractVerticle {
                     getJsonObject(CONFIG, new JsonObject());
 
             // start iterations
-            vertx.eventBus().send(LOOPBACK, workingCopy, (AsyncResult<Message<Boolean>> event) -> {
+            vertx.eventBus().send(LOOPBACK, null, (AsyncResult<Message<Boolean>> event) -> {
                 if (event.succeeded() && event.result().body()) {
                     LOG.log(Level.INFO, "Deployed {0} Verticles: {1}", new Object[]{this.deployed.size(), deployed});
                     startFuture.complete();

@@ -23,20 +23,15 @@
  */
 package de.neofonie.deployer;
 
-import io.vertx.core.json.JsonObject;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
-import java.io.IOException;
-import java.io.InputStream;
-import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
+import static de.neofonie.deployer.DeployerMock.*;
+import java.util.List;
 
 /**
  * Test the config-loader with different JSONs.
@@ -57,8 +52,8 @@ public class DeployerVerticleTest {
     @Test
     public void simpleDeployment(final TestContext context) {
 
-        DeployerVerticle mock = this.prepareDeployer("/simple.json");
-        
+        DeployerVerticle mock = prepareDeployer("/simple.json");
+
         Async async = context.async();
         rule.vertx().deployVerticle(mock,
                 (AsyncResult<String> serverReply) -> {
@@ -81,7 +76,7 @@ public class DeployerVerticleTest {
     @Test
     public void wrongDeployment(final TestContext context) {
 
-        DeployerVerticle mock = this.prepareDeployer("/simple-wrong.json");
+        DeployerVerticle mock = prepareDeployer("/simple-wrong.json");
 
         Async async = context.async();
         rule.vertx().deployVerticle(mock,
@@ -104,7 +99,7 @@ public class DeployerVerticleTest {
     @Test
     public void configDeployment(final TestContext context) {
 
-        DeployerVerticle mock = this.prepareDeployer("/simple-config.json");
+        DeployerVerticle mock = prepareDeployer("/simple-config.json");
 
         Async async = context.async();
         rule.vertx().deployVerticle(mock,
@@ -116,33 +111,55 @@ public class DeployerVerticleTest {
     }
 
     /**
-     * Read a JSON configuration from the classpath.
+     * Test a a deployment with three depending serial verticles.
      *
-     * @param name The filename to read from.
-     * @return JsonObject with the configuration.
+     * @param context The Vertx context
      */
-    private JsonObject readConfiguration(final String name) {
-        JsonObject result = null;
-        try {
-            InputStream u = DeployerVerticleTest.class.getResourceAsStream(name);
-            assertNotNull(u);
-            result = new JsonObject(IOUtils.toString(u));
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
-        return result;
+    @Test
+    public void dependsOnSerial(final TestContext context) {
+
+        DeployerVerticle mock = prepareDeployer("/depending-serial.json");
+        TestVerticle3.order.clear();
+
+        Async async = context.async();
+        rule.vertx().deployVerticle(mock,
+                (AsyncResult<String> serverReply) -> {
+                    List<String> ids = TestVerticle3.order;
+                    context.assertTrue(serverReply.succeeded());
+                    context.assertFalse(ids.isEmpty());
+                    context.assertTrue(ids.size() == 3);
+                    context.assertTrue("v1".equals(ids.get(0)));
+                    context.assertTrue("v3".equals(ids.get(1)));
+                    context.assertTrue("v2".equals(ids.get(2)));
+                    async.complete();
+                    rule.vertx().close();
+                });
     }
 
     /**
-     * Init the mock with a custom configFile.
-     * 
-     * @param configFile The JSON configfile
-     * @return A deployerVerticle with the configFile loaded
+     * Test a a deployment with three depending verticles in parallel and serial
+     *
+     * @param context The Vertx context
      */
-    private DeployerVerticle prepareDeployer(final String configFile) {
-        JsonObject configuration = this.readConfiguration(configFile);
-        DeployerVerticle mock = PowerMockito.mock(DeployerVerticle.class, Mockito.CALLS_REAL_METHODS);
-        PowerMockito.when(mock.loadConfiguration()).thenReturn(configuration);
-        return mock;
+    @Test
+    public void dependsOnParallel(final TestContext context) {
+
+        DeployerVerticle mock = prepareDeployer("/depending-parallel.json");
+        TestVerticle3.order.clear();
+
+        Async async = context.async();
+        rule.vertx().deployVerticle(mock,
+                (AsyncResult<String> serverReply) -> {
+                    List<String> ids = TestVerticle3.order;
+                    context.assertTrue(serverReply.succeeded());
+                    context.assertFalse(ids.isEmpty());
+                    context.assertTrue(ids.size() == 3);
+                    context.assertTrue("v1".equals(ids.get(0)) || "v2".equals(ids.get(0)));
+                    context.assertTrue("v1".equals(ids.get(1)) || "v2".equals(ids.get(1)));
+                    context.assertTrue("v3".equals(ids.get(2)));
+                    async.complete();
+                    rule.vertx().close();
+                });
     }
+
 }
