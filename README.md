@@ -52,8 +52,23 @@ sanity checked by the deployer.
 
 ## Configuration
 
-You can pass a specific configuration to a verticle using the "config" field.
+Everything which is defined under the name "config" in your verticle, is
+injected into the config object inside verticle. You find this configuration in
+context.config().
 
+```
+{
+    "verticles": {
+        "verticle-simple": {
+            "name": "de.neofonie.deployer.TestVerticle2",
+            "config": {
+                "field2": 300,
+                "field3": "text"
+            }
+        }
+    }
+}
+```
 
 ## Global Configuration
 
@@ -69,13 +84,13 @@ takes precedence.
 {
   "config": {
     "service-name": "my-service",
-    "pipeline": {
-        "size": 123456,        
-        "threads": 5
+    "custom-field": {
+        "field1": 52428800,
+        "field2": "value"
     }
-   "verticles": [
+   "verticles": {
         // ....
-    ] 
+    }
 }
 ```
 
@@ -90,3 +105,6 @@ an interval of 5 seconds in which the application can shut down gracefully
 without being terminated. When you need more time to destruct the application
 you are probably doing something wrong, hence we made it a fixed value. Of 
 course, you can always write your own StartVerticle with your own logic inside.
+
+
+
