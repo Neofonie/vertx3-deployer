@@ -6,7 +6,7 @@
     <groupId>de.neofonie</groupId>
     <artifactId>vertx3-deployer</artifactId>
     <packaging>jar</packaging>
-    <version>LATEST</version>
+    <version>1.0.0</version>
     <name>vertx3-deployer</name>
     <url>http://maven.apache.org</url>
 

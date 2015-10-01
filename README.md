@@ -97,7 +97,7 @@ takes precedence.
 ## The StartVerticle
 
 For ease of use, we have constructed a StartVerticle which does the 
-initialisation of the DeployerVerticle for you. The StartVerticle also takes
+initialization of the DeployerVerticle for you. The StartVerticle also takes
 care for the destruction of the verticles when a SIGTERM/SIGINT signal is
 received by the application. This is useful when your application is running
 in a Docker container and needs to do a graceful shutdown. We have defined
