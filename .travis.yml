@@ -1,4 +1,9 @@
 language: java
 jdk:
   - oraclejdk8
-  
+
+deploy:
+  provider: bintray
+  file: "descriptor.json"
+  user: "jan_decooman@yahoo.com"
+  key: "a370eff7e6498551b70e9d4046a72ae18dc36cb9"
