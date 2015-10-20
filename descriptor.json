@@ -4,12 +4,9 @@
        fields are mandatory. */
 
     "package": {
-        "name": "auto-upload", // Bintray package name
+        "name": "vertx3-deployer", // Bintray package name
         "repo": "maven", // Bintray repository name
-        "subject": "decoomanj", // Bintray subject (user or organization)
-        "desc": "vertx3-deployer",
-        "website_url": "https://github.com/Neofonie/vertx3-deployer",
-        "licenses": ["MIT"]
+        "subject": "decoomanj" // Bintray subject (user or organization)
     },
 
     /* Package version information.
