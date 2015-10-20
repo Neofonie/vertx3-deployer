@@ -5,5 +5,5 @@ jdk:
 deploy:
   provider: bintray
   file: "descriptor.json"
-  user: "jan_decooman@yahoo.com"
+  user: "decoomanj"
   key: "a370eff7e6498551b70e9d4046a72ae18dc36cb9"
