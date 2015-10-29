@@ -2,6 +2,8 @@ language: java
 jdk:
   - oraclejdk8
 
+script: mvn clean javadoc:jar source:jar package install deploy
+
 deploy:
   provider: bintray
   file: "descriptor.json"
