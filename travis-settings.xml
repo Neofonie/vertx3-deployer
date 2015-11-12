@@ -11,7 +11,7 @@
     <server>
       <id>bintray</id>
       <username>decoomanj</username>
-      <password>${ENV.BINTRAY_API_KEY}</password>
+      <password>${env.BINTRAY_API_KEY}</password>
     </server>
   </servers>
   <mirrors/>
