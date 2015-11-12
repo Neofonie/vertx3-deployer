@@ -98,7 +98,7 @@
     <distributionManagement>
     	<repository>
   	  <id>bintray</id>
-	  <url>https://api.bintray.com/content/decoomanj/maven/vertx3-deployer</url>
+	  <url>https://api.bintray.com/maven/decoomanj/maven/vertx3-deployer</url>
     	</repository>
     </distributionManagement>
 
