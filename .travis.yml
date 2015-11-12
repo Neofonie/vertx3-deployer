@@ -4,8 +4,8 @@ jdk:
 
 script: mvn clean javadoc:jar source:jar package install deploy --settings travis-settings.xml
 
-deploy:
-  provider: bintray
-  file: "descriptor.json"
-  user: "decoomanj"
-  key: "a370eff7e6498551b70e9d4046a72ae18dc36cb9"
+#deploy:
+#  provider: bintray
+#  file: "descriptor.json"
+#  user: "decoomanj"
+#  key: "a370eff7e6498551b70e9d4046a72ae18dc36cb9"
