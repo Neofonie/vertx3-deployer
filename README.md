@@ -1,5 +1,9 @@
 # Vertx 3 Deployer Module
 
+
+## **⚠️ THIS PROJECT IS NOW UNMAINTED AND IN READ-ONLY MODE ⚠️**
+
+
 One of the problems you encounter when you have a lot of verticles to deploy, 
 is how to define dependencies between them, define an order, and organize the 
 configuration. 
